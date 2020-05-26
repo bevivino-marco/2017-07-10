@@ -6,6 +6,8 @@ package it.polito.tdp.artsmia;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import it.polito.tdp.artsmia.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -39,9 +41,19 @@ public class ArtsmiaController {
 	@FXML // fx:id="txtResult"
 	private TextArea txtResult; // Value injected by FXMLLoader
 
+	private Model model;
+
 	@FXML
 	void doAnalizzaOggetti(ActionEvent event) {
-		txtResult.setText("doAnalizzaOggetti");
+		try {
+			int oid = Integer.parseInt(txtObjectId.getText());
+			model.creaGrafo();
+			txtResult.appendText(model.componenteConnessa(oid).toString());
+			
+		}catch (Exception e) {
+			txtResult.setText("errore nella creazione del grafo");
+		}/**/
+		
 	}
 
 	@FXML
@@ -63,5 +75,10 @@ public class ArtsmiaController {
 		assert txtObjectId != null : "fx:id=\"txtObjectId\" was not injected: check your FXML file 'Artsmia.fxml'.";
 		assert txtResult != null : "fx:id=\"txtResult\" was not injected: check your FXML file 'Artsmia.fxml'.";
 
+	}
+
+	public void setModel(Model m) {
+		this.model=m;
+		
 	}
 }
