@@ -27,6 +27,8 @@ public class Model {
 	// dao;
 	ArtsmiaDAO dao ;
 	private Map<Integer, Integer> backVisit;
+	private int LUN;
+	private String classification;
 public Model() {
 	dao = new ArtsmiaDAO();
 }
@@ -67,7 +69,7 @@ public List<ArtObject> getOggetti() {
 	return oggetti;
 }
 
-public List <Integer> componenteConnessa(int id) {
+public int componenteConnessa(int id) {
 	List <Integer> result = new ArrayList<Integer>();
 	backVisit = new HashMap<>();
 	GraphIterator <Integer, DefaultWeightedEdge> it = new DepthFirstIterator<>(this.grafo, id);
@@ -121,8 +123,101 @@ public List <Integer> componenteConnessa(int id) {
 		result.add(it.next());
 	}
 	System.out.println(backVisit);
+	return result.size();
+}
+
+
+public List <Integer> camminoMax (int id, int lun){
+	ArtObject ao=null ;
+	for (ArtObject a : oggetti) {
+		if (a.getId()==id)
+			ao=a;
+	}
+	classification = ao.getClassification();
+	int start = id;
+	LUN = lun;
+	List<Integer> result = new LinkedList<>();
+	List<Integer> parziale = new LinkedList<>();
+	parziale.add(start);
+	cerca (start, 1 , result, parziale);
+	
 	return result;
 }
+
+
+
+public void cerca (int start, int i, List<Integer> result, List<Integer> parziale) {
+	List <Integer> vicini = Graphs.neighborListOf(grafo, start);
+	if (vicini.isEmpty()) {
+		return;
+	}
+	if (i==LUN) {
+		if (result.size()==0 || confrontaCammini(parziale, result)>0) {
+			result.clear();
+			result.addAll(parziale);
+			System.out.println(parziale.toString());
+			return;
+		}
+	}
+	
+	
+	for (Integer o : vicini) {
+		if (parziale.size()<LUN && !parziale.contains(o) && (result.size()==0 || valido(o))) {
+			parziale.add(o);
+			System.out.println(parziale.toString());
+			cerca(o, i+1, result, parziale);
+			parziale.remove(o);
+		}
+	}
+	
+	
 }
+private int confrontaCammini(List<Integer> parziale, List<Integer> result) {
+	int cP=0;
+	int cR=0;
+	for (int p : parziale) {
+		if (p!=parziale.get(parziale.size()-1)) {
+		int p1 = parziale.get(parziale.indexOf(p)+1);
+		cP+= grafo.getEdgeWeight(grafo.getEdge(p, p1));
+		
+		}
+		
+	}
+	for (int p : result) {
+		if (p!=result.get(result.size()-1)) {
+		int p1 = result.get(result.indexOf(p)+1);
+		cR+= grafo.getEdgeWeight(grafo.getEdge(p, p1));
+		
+		}
+		
+	}
+	return cP-cR;
+}
+private boolean valido(Integer o) {
+	ArtObject ao=null ;
+	for (ArtObject a : oggetti) {
+		if (a.getId()==o)
+			ao=a;
+	}
+	if (ao.getClassification().equals(classification))
+		return true;
+	return false;
+}
+	
+	
+	
+	
+	
+	
+	
+}
+
+
+
+
+
+
+
+
 
 

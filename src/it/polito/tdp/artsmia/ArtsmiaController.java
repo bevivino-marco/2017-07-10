@@ -24,7 +24,7 @@ public class ArtsmiaController {
 	private URL location;
 
 	@FXML // fx:id="boxLUN"
-	private ChoiceBox<?> boxLUN; // Value injected by FXMLLoader
+	private ChoiceBox<Integer> boxLUN; // Value injected by FXMLLoader
 
 	@FXML // fx:id="btnCalcolaComponenteConnessa"
 	private Button btnCalcolaComponenteConnessa; // Value injected by FXMLLoader
@@ -48,7 +48,11 @@ public class ArtsmiaController {
 		try {
 			int oid = Integer.parseInt(txtObjectId.getText());
 			model.creaGrafo();
-			txtResult.appendText(model.componenteConnessa(oid).toString());
+			int s = model.componenteConnessa(oid);
+			txtResult.appendText(s+"");
+			for (int i =2 ; i<=s; i++) {
+				boxLUN.getItems().add(i);
+			}
 			
 		}catch (Exception e) {
 			txtResult.setText("errore nella creazione del grafo");
@@ -58,7 +62,15 @@ public class ArtsmiaController {
 
 	@FXML
 	void doCalcolaComponenteConnessa(ActionEvent event) {
-		txtResult.setText("doCalcolaComponenteConnessa");
+		try {
+			int oid = Integer.parseInt(txtObjectId.getText());
+			
+			txtResult.appendText(model.camminoMax(oid, boxLUN.getValue()).toString());
+			
+		}catch (Exception e) {
+			txtResult.setText("Errore in doCalcolaComponenteConnessa");
+		}
+		
 	}
 
 	@FXML
